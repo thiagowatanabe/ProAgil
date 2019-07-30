@@ -1,3 +1,4 @@
+<app-titulo [titulo]="titulo"></app-titulo>
 <div class="d-flex">
 
   <div class="form-inline mr-auto">
@@ -8,7 +9,6 @@
 
   <div>
     <button class="btn btn-outline-primary" (click)="novoEvento(template)"> <i class="fa fa-plus-circle"></i>  Novo Evento</button>
-
   </div>
 
 </div>
@@ -41,7 +41,7 @@
         <td>{{ item.id }}</td>
       <td>{{ item.tema }}</td>
       <td>{{ item.local }}</td>
-      <td>{{ item.data | DateTimeFormatPipe }}</td>
+      <td>{{ item.data }}</td>
       <td>{{ item.qtdPessoas }}</td>
       <td>
         <div *ngIf="!item.lotes.length">
@@ -65,7 +65,7 @@
       </td>
     </tr>
   </tbody>
-  <tfoot *ngIf="!eventos.length">
+  <tfoot *ngIf="eventos && !eventos.length">
     <tr>
       <td colspan=7 class="text-center">
         Nenhum evento encontrado

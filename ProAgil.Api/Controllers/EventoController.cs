@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ProAgil.Api.Dtos;
 using ProAgil.Domain;
 using ProAgil.Repository;
 
@@ -12,8 +15,10 @@ namespace ProAgil.Api.Controllers
     public class EventoController : ControllerBase
     {
         private readonly IProAgilRepository _repository;
-        public EventoController(IProAgilRepository repository)
+        private readonly IMapper _mapper;
+        public EventoController(IProAgilRepository repository, IMapper mapper)
         {
+            _mapper = mapper;
             _repository = repository;
         }
 
@@ -23,10 +28,13 @@ namespace ProAgil.Api.Controllers
         {
             try
             {
-                var results = await _repository.GetAllEventosAsync(true);
+                var eventos = await _repository.GetAllEventosAsync(true);
+
+                var results = _mapper.Map<EventoDto[]>(eventos);
+
                 return Ok(results);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Banco de dados falou {ex.Message}");
             }
@@ -38,7 +46,8 @@ namespace ProAgil.Api.Controllers
         {
             try
             {
-                var results = await _repository.GetAllEventosAsyncById(EventoId, true);
+                var evento = await _repository.GetAllEventosAsyncById(EventoId, true);
+                var results = _mapper.Map<EventoDto>(evento);
                 return Ok(results);
             }
             catch
@@ -53,7 +62,8 @@ namespace ProAgil.Api.Controllers
         {
             try
             {
-                var results = await _repository.GetAllEventosAsyncByTema(tema, true);
+                var evento = await _repository.GetAllEventosAsyncByTema(tema, true);
+                var results = _mapper.Map<List<EventoDto>>(evento);
                 return Ok(results);
             }
             catch
@@ -64,14 +74,16 @@ namespace ProAgil.Api.Controllers
 
         // GET api/values
         [HttpPost]
-        public async Task<ActionResult> Post(Evento model)
+        public async Task<ActionResult> Post(EventoDto model)
         {
             try
             {
-                _repository.Add(model);
+                var evento = _mapper.Map<Evento>(model);
+
+                _repository.Add(evento);
                 if (await _repository.SaveChangesAsync())
                 {
-                    return Created($"/api/evento/{model.Id}", model);
+                    return Created($"/api/evento/{evento.Id}", _mapper.Map<EventoDto>(evento));
                 }
                 return BadRequest();
             }
@@ -87,12 +99,15 @@ namespace ProAgil.Api.Controllers
         {
             try
             {
-                var evento = await _repository.GetAllEventosAsyncById(EventoId,false);
-                if(evento == null) return NotFound();
-                _repository.Update(model);
+                var evento = await _repository.GetAllEventosAsyncById(EventoId, false);
+                if (evento == null) return NotFound();
+
+                evento = _mapper.Map(model, evento);
+
+                _repository.Update(evento);
                 if (await _repository.SaveChangesAsync())
                 {
-                    return Created($"/api/evento/{model.Id}", model);
+                    return Created($"/api/evento/{evento.Id}", _mapper.Map<EventoDto>(evento));
                 }
                 return BadRequest();
             }
@@ -102,14 +117,14 @@ namespace ProAgil.Api.Controllers
             }
         }
 
-         // GET api/values
+        // GET api/values
         [HttpDelete("{EventoId}")]
         public async Task<ActionResult> Delete(int EventoId)
         {
             try
             {
-                var evento = await _repository.GetAllEventosAsyncById(EventoId,false);
-                if(evento == null) return NotFound();
+                var evento = await _repository.GetAllEventosAsyncById(EventoId, false);
+                if (evento == null) return NotFound();
                 _repository.Delete(evento);
                 if (await _repository.SaveChangesAsync())
                 {
