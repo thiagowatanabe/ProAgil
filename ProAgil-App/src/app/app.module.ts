@@ -40,7 +40,12 @@ import { DashboardComponent } from './dashboard/dashboard.component';
       TooltipModule.forRoot(),
       ModalModule.forRoot(),
       BsDatepickerModule.forRoot(),
-      ToastrModule.forRoot()
+      ToastrModule.forRoot({
+         timeOut: 3000,
+         preventDuplicates: true,
+         progressBar: true,
+         positionClass: 'toast-top-full-width'
+      })
    ],
    providers: [],
    bootstrap: [
