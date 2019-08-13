@@ -1,3 +1,7 @@
+import { AuthGuard } from './auth/auth.guard';
+import { RegistrationComponent } from './user/registration/registration.component';
+import { LoginComponent } from './user/login/login.component';
+import { UserComponent } from './user/user.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ContatosComponent } from './contatos/contatos.component';
 import { PalestrantesComponent } from './palestrantes/palestrantes.component';
@@ -6,10 +10,18 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
-  {path: 'eventos', component: EventosComponent},
-  {path: 'palestrantes', component: PalestrantesComponent},
-  {path: 'contato', component: ContatosComponent},
-  {path: 'dashboard', component: DashboardComponent},
+  {path: 'user', component: UserComponent,
+    children:
+    [
+      { path: 'login', component: LoginComponent },
+      { path: 'registration', component: RegistrationComponent }
+    ]
+  },
+
+  {path: 'eventos', component: EventosComponent, canActivate: [AuthGuard]},
+  {path: 'palestrantes', component: PalestrantesComponent, canActivate: [AuthGuard]},
+  {path: 'contato', component: ContatosComponent, canActivate: [AuthGuard]},
+  {path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
   {path: '**', redirectTo: 'dashboard', pathMatch: 'full'}
 ];
